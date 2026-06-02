@@ -2,6 +2,7 @@
 
 ## 전체 아키텍처
 
+```text
 Spring Boot Services
   - order-service
   - payment-service
@@ -22,6 +23,7 @@ Iceberg Gold Tables
 Athena
         ↓
 Dashboard
+```
 
 ## 서비스 계층
 
@@ -39,6 +41,7 @@ Dashboard
 
 도메인별 Topic을 사용합니다.
 
+```text
 nova.user.events
 nova.order.events
 nova.payment.events
@@ -47,6 +50,7 @@ nova.return.events
 nova.refund.events
 nova.review.events
 nova.coupon.events
+```
 
 ### Bronze Layer
 

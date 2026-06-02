@@ -5,10 +5,9 @@
 Order Service가 Kafka로 발행하는 이벤트의 구조와 규칙을 정의한다.
 데이터 계약(Data Contract)은 Producer와 Consumer가 동일한 이벤트 구조를 사용하도록 보장하기 위한 문서이다.
 
----
-
 ## Topic Naming Rule
 
+```text
 nova.user.events
 nova.order.events
 nova.payment.events
@@ -17,20 +16,18 @@ nova.return.events
 nova.refund.events
 nova.review.events
 nova.coupon.events
-
----
+```
 
 ## 첫 번째 이벤트
 
 ### Topic
 
-nova.order.events
+**nova.order.events**
 
 ### Event Type
 
 ORDER_CREATED
 
----
 
 ## ORDER_CREATED 이벤트 스키마
 
@@ -49,10 +46,10 @@ ORDER_CREATED
 | channel | string | Y | 주문 채널 |
 | coupon_id | string | N | 사용 쿠폰 ID |
 
----
 
 ## 이벤트 예시
 
+```json
 {
   "event_id": "evt-000001",
   "event_type": "ORDER_CREATED",
@@ -67,21 +64,19 @@ ORDER_CREATED
   "channel": "APP",
   "coupon_id": "cpn-202606"
 }
-
----
+```
 
 ## 허용 상태값 (Order Status)
 
-CREATED
-PAID
-CANCELLED
-SHIPPED
-DELIVERED
-RETURN_REQUESTED
-RETURNED
-REFUNDED
+- CREATED
+- PAID
+- CANCELLED
+- SHIPPED
+- DELIVERED
+- RETURN_REQUESTED
+- RETURNED
+- REFUNDED
 
----
 
 ## 데이터 품질 규칙
 
@@ -95,9 +90,11 @@ REFUNDED
 - ISO-8601 형식 사용
 - KST(+09:00) 기준
 
-예시
+**예시**
 
+```text
 2026-06-02T10:00:00+09:00
+```
 
 ### order_amount
 
@@ -112,7 +109,6 @@ REFUNDED
 
 - 허용된 상태값만 사용 가능
 
----
 
 ## DLQ 조건
 
@@ -125,11 +121,10 @@ REFUNDED
 - 허용되지 않은 order_status
 - JSON 파싱 실패
 
-DLQ Topic
+**DLQ Topic**
 
 nova.order.events.dlq
 
----
 
 ## 스키마 진화(Schema Evolution) 정책
 
@@ -139,12 +134,14 @@ nova.order.events.dlq
 - 기존 Optional 컬럼 추가
 - 기존 필드 유지
 
-예시
+**예시**
 
+```json
 {
   "coupon_id": "cpn-001",
   "seller_id": "seller-001"
 }
+```
 
 ### 비허용
 
@@ -152,44 +149,44 @@ nova.order.events.dlq
 - 필드 타입 변경
 - 필수 필드 제거
 
-예시
+**예시**
 
 order_amount
 
+```bash
 long
 ↓
-
 string
 
-금지
-
----
+금지!
+```
 
 ## Bronze 저장 정책
 
 원본 이벤트를 수정하지 않는다.
 
+```bash
 Kafka
 ↓
 Bronze
+```
 
 에는 원본 JSON을 그대로 저장한다.
 
-목적
+###목적
 
 - 재처리
 - 감사 추적
 - 장애 복구
 - Backfill
 
----
 
 ## 향후 추가 이벤트
 
-ORDER_PAID
-ORDER_CANCELLED
-ORDER_SHIPPED
-ORDER_DELIVERED
-RETURN_REQUESTED
-RETURNED
-REFUND_COMPLETED
+- ORDER_PAID
+- ORDER_CANCELLED
+- ORDER_SHIPPED
+- ORDER_DELIVERED
+- RETURN_REQUESTED
+- RETURNED
+- REFUND_COMPLETED
