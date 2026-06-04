@@ -8,7 +8,7 @@ public record OrderCreatedEvent(
         String orderId,
         String userId,
         String productId,
-        int quality,
+        int quantity,
         long orderAmount,
         LocalDateTime eventTime
 ) {
