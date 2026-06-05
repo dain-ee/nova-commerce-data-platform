@@ -59,6 +59,14 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    // API 7) 반품 완료 처리
+    @PostMapping("/{orderId}/return")
+    public ResponseEntity<Void> returnOrder(@PathVariable String orderId) {
+        orderService.returnOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 

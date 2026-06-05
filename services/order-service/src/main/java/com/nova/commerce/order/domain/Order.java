@@ -131,4 +131,13 @@ public class Order {
         this.status = OrderStatus.RETURN_REQUESTED;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 메서드9. 반품 완료
+    public void returnOrder(){
+        if (this.status != OrderStatus.RETURN_REQUESTED) {
+            throw new IllegalStateException("Only RETURN_REQUESTED orders can be returned.");
+        }
+        this.status = OrderStatus.RETURNED;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

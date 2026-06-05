@@ -181,5 +181,23 @@ public class OrderService {
 
     }
 
+    // 메서드7. 반품 완료 처리
+    @Transactional
+    public void returnOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+
+        order.returnOrder();
+        OrderReturnedEvent event = new OrderReturnedEvent(
+                UUID.randomUUID().toString(),
+                "RETURNED",
+                order.getOrderId(),
+                order.getUserId(),
+                "RETURNED",
+                LocalDateTime.now()
+        );
+        orderEventPublisher.publish(event);
+    }
+
 
 }
