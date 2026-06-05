@@ -95,4 +95,13 @@ public class Order {
         this.status = OrderStatus.PAID;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 메서드5. 배송
+    public void ship(){
+        if (this.status != OrderStatus.PAID) {
+            throw new IllegalStateException("Only PAID orders can be shipped.");
+        }
+        this.status = OrderStatus.SHIPPED;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -4,12 +4,9 @@ import com.nova.commerce.order.api.dto.CreateOrderRequest;
 import com.nova.commerce.order.api.dto.CreateOrderResponse;
 import com.nova.commerce.order.domain.Order;
 import com.nova.commerce.order.domain.OrderRepository;
-import com.nova.commerce.order.event.OrderCreatedEvent;
-import com.nova.commerce.order.event.OrderEventPublisher;
+import com.nova.commerce.order.event.*;
 import com.nova.commerce.order.api.dto.CreateOrderItemRequest;
 import com.nova.commerce.order.domain.OrderItem;
-import com.nova.commerce.order.event.OrderItemPayload;
-import com.nova.commerce.order.event.OrderPaidEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +99,25 @@ public class OrderService {
                 order.getOrderId(),
                 order.getUserId(),
                 order.getTotalAmount(),
+                LocalDateTime.now()
+        );
+        orderEventPublisher.publish(event);
+    }
+
+    // 메서드4. 주문 배송
+    @Transactional
+    public void shipOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+
+        order.ship();
+
+        OrderShippedEvent event = new OrderShippedEvent(
+                UUID.randomUUID().toString(),
+                "ORDER_SHIPPED",
+                order.getOrderId(),
+                order.getUserId(),
+                "SHIPPED",
                 LocalDateTime.now()
         );
         orderEventPublisher.publish(event);
