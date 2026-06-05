@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final OrderService orderService;
 
+    // API 1) 주문 생성 요청 처리
     @PostMapping
     public ResponseEntity<CreateOrderResponse> createOrder(
             @Valid @RequestBody CreateOrderRequest request) {
@@ -22,4 +23,13 @@ public class OrderController {
                     orderService.createOrder(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    // API 2) 주문 결제 요청 처리
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<Void> payOrder(@PathVariable String orderId) {
+        orderService.payOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

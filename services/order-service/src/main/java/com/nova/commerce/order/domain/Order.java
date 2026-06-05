@@ -52,6 +52,7 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // 메서드1. 주문 생성
     public static Order create(String userId, String channel, String couponId, List<OrderItem> items) {
         LocalDateTime now = LocalDateTime.now();
 
@@ -71,16 +72,27 @@ public class Order {
         return order;
     }
 
+    // 메서드2. 총합 계산
     public static long calculateGrossAmount(List<OrderItem> items) {
         return items.stream()
                 .mapToLong(OrderItem::getLineAmount)
                 .sum();
     }
 
+    // 메서드3. 할인 계산
     public static long calculateDiscountAmount(String couponId) {
         if (couponId == null || couponId.isBlank()) {
             return 0;
         }
         return 5000;
+    }
+
+    // 메서드4. 결제
+    public void pay(){
+        if (this.status != OrderStatus.CREATED) {
+            throw new IllegalStateException("Only CREATED orders can be paid.");
+        }
+        this.status = OrderStatus.PAID;
+        this.updatedAt = LocalDateTime.now();
     }
 }

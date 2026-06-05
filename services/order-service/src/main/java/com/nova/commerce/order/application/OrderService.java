@@ -9,6 +9,7 @@ import com.nova.commerce.order.event.OrderEventPublisher;
 import com.nova.commerce.order.api.dto.CreateOrderItemRequest;
 import com.nova.commerce.order.domain.OrderItem;
 import com.nova.commerce.order.event.OrderItemPayload;
+import com.nova.commerce.order.event.OrderPaidEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderEventPublisher orderEventPublisher;
 
+    // 메서드1. 주문 생성
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
 
@@ -75,6 +77,7 @@ public class OrderService {
         );
     }
 
+    // 메서드2. 아이템주문 DTO를 도메인으로 변경
     private OrderItem toOrderItem(CreateOrderItemRequest itemRequest) {
         return OrderItem.create(
                 itemRequest.productId(),
@@ -83,6 +86,25 @@ public class OrderService {
                 itemRequest.quantity(),
                 itemRequest.unitPrice()
         );
+    }
+
+    // 메서드3. 주문 결제
+    @Transactional
+    public void payOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+
+        order.pay();
+
+        OrderPaidEvent event = new OrderPaidEvent(
+                UUID.randomUUID().toString(),
+                "ORDER_PAID",
+                order.getOrderId(),
+                order.getUserId(),
+                order.getTotalAmount(),
+                LocalDateTime.now()
+        );
+        orderEventPublisher.publish(event);
     }
 
 
