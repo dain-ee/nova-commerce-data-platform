@@ -85,7 +85,7 @@ public class OrderService {
         );
     }
 
-    // 메서드3. 주문 결제
+    // 메서드3. 주문 결제 처리
     @Transactional
     public void payOrder(String orderId) {
         Order order = orderRepository.findById(orderId)
@@ -104,7 +104,7 @@ public class OrderService {
         orderEventPublisher.publish(event);
     }
 
-    // 메서드4. 주문 배송
+    // 메서드4. 주문 배송 시작 처리
     @Transactional
     public void shipOrder(String orderId) {
         Order order = orderRepository.findById(orderId)
@@ -118,6 +118,25 @@ public class OrderService {
                 order.getOrderId(),
                 order.getUserId(),
                 "SHIPPED",
+                LocalDateTime.now()
+        );
+        orderEventPublisher.publish(event);
+    }
+
+    // 메서드4. 주문 배송 완료 처리
+    @Transactional
+    public void deliverOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+
+        order.deliver();
+
+        OrderDeliveredEvent event = new OrderDeliveredEvent(
+                UUID.randomUUID().toString(),
+                "ORDER_DELIVERED",
+                order.getOrderId(),
+                order.getUserId(),
+                "DELIVERED",
                 LocalDateTime.now()
         );
         orderEventPublisher.publish(event);

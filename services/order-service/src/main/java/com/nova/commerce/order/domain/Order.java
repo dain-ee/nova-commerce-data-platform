@@ -87,7 +87,7 @@ public class Order {
         return 5000;
     }
 
-    // 메서드4. 결제
+    // 메서드4. 결제 완료
     public void pay(){
         if (this.status != OrderStatus.CREATED) {
             throw new IllegalStateException("Only CREATED orders can be paid.");
@@ -96,12 +96,21 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 메서드5. 배송
+    // 메서드5. 배송 시작
     public void ship(){
         if (this.status != OrderStatus.PAID) {
             throw new IllegalStateException("Only PAID orders can be shipped.");
         }
         this.status = OrderStatus.SHIPPED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 메서드6. 배송 완료
+    public void deliver(){
+        if (this.status != OrderStatus.SHIPPED) {
+            throw new IllegalStateException("Only SHIPPED orders can be delivered.");
+        }
+        this.status = OrderStatus.DELIVERED;
         this.updatedAt = LocalDateTime.now();
     }
 }
