@@ -122,4 +122,13 @@ public class Order {
         this.status = OrderStatus.CANCELED;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 메서드8. 반품 요청
+    public void requestReturn(){
+        if  (this.status != OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Only DELIVERED orders can be returned.");
+        }
+        this.status = OrderStatus.RETURN_REQUESTED;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

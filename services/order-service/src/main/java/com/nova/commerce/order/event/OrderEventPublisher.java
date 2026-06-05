@@ -56,5 +56,14 @@ public class OrderEventPublisher {
                 event
         );
     }
+
+    // 메서드6. 반품 요청 이벤트 발행
+    public void publish(OrderReturnRequestedEvent event){
+        kafkaTemplate.send(
+                ORDER_EVENTS_TOPIC,
+                event.orderId(),
+                event
+        );
+    }
 }
 
