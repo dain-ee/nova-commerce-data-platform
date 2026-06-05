@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,6 +27,7 @@ public class OrderService {
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
 
+        // DTO를 도메인으로 변환
         List<OrderItem> orderItems = request.items().stream()
                 .map(this::toOrderItem)
                 .toList();
@@ -61,6 +61,8 @@ public class OrderService {
                 savedOrder.getChannel(),
                 savedOrder.getCouponId(),
                 itemPayloads,
+                savedOrder.getGrossAmount(),
+                savedOrder.getDiscountAmount(),
                 savedOrder.getTotalAmount(),
                 LocalDateTime.now()
         );

@@ -11,6 +11,8 @@ public record OrderCreatedEvent(
         String channel,
         String couponId,
         List<OrderItemPayload> items,
+        long grossAmount,
+        long discountAmount,
         long totalAmount,
         LocalDateTime eventTime
 ) {

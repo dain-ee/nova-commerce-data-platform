@@ -29,6 +29,12 @@ public class Order {
     @Column(name = "coupon_id",length = 50)
     private String couponId;
 
+    @Column(name = "gross_amount",nullable = false)
+    private long grossAmount;
+
+    @Column(name = "discount_amount")
+    private long discountAmount;
+
     @Column(name = "total_amount", nullable = false)
     private long totalAmount;
 
@@ -55,7 +61,9 @@ public class Order {
         order.channel = channel;
         order.couponId = couponId;
         order.items.addAll(items);
-        order.totalAmount = calculateTotalAmount(items);
+        order.grossAmount = calculateGrossAmount(items);
+        order.discountAmount = calculateDiscountAmount(couponId);
+        order.totalAmount = order.grossAmount - order.discountAmount;
         order.status = OrderStatus.CREATED;
         order.createdAt = now;
         order.updatedAt = now;
@@ -63,9 +71,16 @@ public class Order {
         return order;
     }
 
-    public static long calculateTotalAmount(List<OrderItem> items) {
+    public static long calculateGrossAmount(List<OrderItem> items) {
         return items.stream()
                 .mapToLong(OrderItem::getLineAmount)
                 .sum();
+    }
+
+    public static long calculateDiscountAmount(String couponId) {
+        if (couponId == null || couponId.isBlank()) {
+            return 0;
+        }
+        return 5000;
     }
 }
