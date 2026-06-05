@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,14 +23,18 @@ public class Order {
     @Column(name = "user_id", nullable = false, length = 50)
     private String userId;
 
-    @Column(name = "product_id", nullable = false, length = 50)
-    private String productId;
+    @Column(name = "channel",nullable = false,length = 30)
+    private String channel;
 
-    @Column(nullable = false)
-    private int quantity;
+    @Column(name = "coupon_id",length = 50)
+    private String couponId;
 
-    @Column(name = "order_amount", nullable = false)
-    private long orderAmount;
+    @Column(name = "total_amount", nullable = false)
+    private long totalAmount;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private List<OrderItem> items = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -40,19 +46,26 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public static Order create(String userId, String productId, int quantity, long orderAmount) {
+    public static Order create(String userId, String channel, String couponId, List<OrderItem> items) {
         LocalDateTime now = LocalDateTime.now();
 
         Order order = new Order();
         order.orderId = "ord-" + UUID.randomUUID();
         order.userId = userId;
-        order.productId = productId;
-        order.quantity = quantity;
-        order.orderAmount = orderAmount;
+        order.channel = channel;
+        order.couponId = couponId;
+        order.items.addAll(items);
+        order.totalAmount = calculateTotalAmount(items);
         order.status = OrderStatus.CREATED;
         order.createdAt = now;
         order.updatedAt = now;
 
         return order;
+    }
+
+    public static long calculateTotalAmount(List<OrderItem> items) {
+        return items.stream()
+                .mapToLong(OrderItem::getLineAmount)
+                .sum();
     }
 }

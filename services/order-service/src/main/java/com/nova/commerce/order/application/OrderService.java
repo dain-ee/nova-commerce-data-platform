@@ -6,9 +6,15 @@ import com.nova.commerce.order.domain.Order;
 import com.nova.commerce.order.domain.OrderRepository;
 import com.nova.commerce.order.event.OrderCreatedEvent;
 import com.nova.commerce.order.event.OrderEventPublisher;
+import com.nova.commerce.order.api.dto.CreateOrderItemRequest;
+import com.nova.commerce.order.domain.OrderItem;
+import com.nova.commerce.order.event.OrderItemPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,33 +22,46 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private static final long DEFAULT_UNIT_PRICE = 29500L;
-
     private final OrderRepository orderRepository;
     private final OrderEventPublisher orderEventPublisher;
 
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
 
-        long orderAmount = DEFAULT_UNIT_PRICE * request.quantity();
+        List<OrderItem> orderItems = request.items().stream()
+                .map(this::toOrderItem)
+                .toList();
 
-        Order order =
-                Order.create(
+        Order order = Order.create(
                         request.userId(),
-                        request.productId(),
-                        request.quantity(),
-                        orderAmount
+                        request.channel(),
+                        request.couponId(),
+                        orderItems
                 );
 
         Order savedOrder = orderRepository.save(order);
+
+        List<OrderItemPayload> itemPayloads =
+                savedOrder.getItems().stream()
+                        .map(item -> new OrderItemPayload(
+                                item.getProductId(),
+                                item.getProductName(),
+                                item.getCategory(),
+                                item.getQuantity(),
+                                item.getUnitPrice(),
+                                item.getLineAmount()
+                        ))
+                        .toList();
+
         OrderCreatedEvent event = new OrderCreatedEvent(
                 UUID.randomUUID().toString(),
       "ORDER_CREATED",
                 savedOrder.getOrderId(),
                 savedOrder.getUserId(),
-                savedOrder.getProductId(),
-                savedOrder.getQuantity(),
-                savedOrder.getOrderAmount(),
+                savedOrder.getChannel(),
+                savedOrder.getCouponId(),
+                itemPayloads,
+                savedOrder.getTotalAmount(),
                 LocalDateTime.now()
         );
 
@@ -51,6 +70,16 @@ public class OrderService {
         return new CreateOrderResponse(
                 savedOrder.getOrderId(),
                 savedOrder.getStatus().name()
+        );
+    }
+
+    private OrderItem toOrderItem(CreateOrderItemRequest itemRequest) {
+        return OrderItem.create(
+                itemRequest.productId(),
+                itemRequest.productName(),
+                itemRequest.category(),
+                itemRequest.quantity(),
+                itemRequest.unitPrice()
         );
     }
 
