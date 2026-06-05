@@ -113,4 +113,13 @@ public class Order {
         this.status = OrderStatus.DELIVERED;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 메서드7. 주문 취소
+    public void cancel(){
+        if (this.status != OrderStatus.PAID && this.status != OrderStatus.CREATED) {
+            throw new IllegalStateException("Only PAID orders can be cancelled.");
+        }
+        this.status = OrderStatus.CANCELED;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

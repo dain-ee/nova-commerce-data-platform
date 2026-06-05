@@ -45,6 +45,15 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    // API 5) 주문 취소 요청 처리
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable String orderId) {
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 
 
 }

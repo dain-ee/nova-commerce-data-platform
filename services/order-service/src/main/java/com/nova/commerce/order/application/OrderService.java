@@ -142,5 +142,24 @@ public class OrderService {
         orderEventPublisher.publish(event);
     }
 
+    // 메서드5. 주문 취소 처리
+    @Transactional
+    public void cancelOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+
+        order.cancel();
+
+        OrderCanceledEvent event = new OrderCanceledEvent(
+                UUID.randomUUID().toString(),
+                "ORDER_CANCELED",
+                order.getOrderId(),
+                order.getUserId(),
+                order.getTotalAmount(),
+                LocalDateTime.now()
+        );
+        orderEventPublisher.publish(event);
+    }
+
 
 }
