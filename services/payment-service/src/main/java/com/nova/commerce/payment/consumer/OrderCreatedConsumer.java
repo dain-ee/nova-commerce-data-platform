@@ -1,8 +1,8 @@
 package com.nova.commerce.payment.consumer;
 
-import com.nova.commerce.payment.event.OrderCreatedEvent;
 import com.nova.commerce.payment.event.PaymentCompletedEvent;
 import com.nova.commerce.payment.event.PaymentEventPublisher;
+import com.nova.commerce.payment.event.PaymentRequestedEvent;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,14 +18,14 @@ public class OrderCreatedConsumer {
 
     private final PaymentEventPublisher paymentEventPublisher;
 
-    @KafkaListener(topics = "nova.order.events",groupId = "payment-service")
-    public void consume(OrderCreatedEvent event) {
-        if (!"ORDER_CREATED".equals(event.eventType())) {
+    @KafkaListener(topics = "nova.payment.events",groupId = "payment-service")
+    public void consume(PaymentRequestedEvent event) {
+        if (!"PAYMENT_REQUESTED".equals(event.eventType())) {
             return;
         }
 
         log.info(
-                "[PAYMENT] ORDER_CREATED received. orderId={}, userId={}, amount={}",
+                "[PAYMENT] PAYMENT_REQUESTED received. orderId={}, userId={}, amount={}",
                 event.orderId(),
                 event.userId(),
                 event.totalAmount()

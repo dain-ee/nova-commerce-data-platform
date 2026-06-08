@@ -91,16 +91,17 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
 
-        order.pay();
-
-        OrderPaidEvent event = new OrderPaidEvent(
+        PaymentRequestedEvent event = new PaymentRequestedEvent(
                 UUID.randomUUID().toString(),
-                "ORDER_PAID",
+                "PAYMENT_REQUESTED",
                 order.getOrderId(),
                 order.getUserId(),
                 order.getTotalAmount(),
+                "CARD",
+                "1111",
                 LocalDateTime.now()
         );
+
         orderEventPublisher.publish(event);
     }
 
@@ -216,6 +217,7 @@ public class OrderService {
         );
         orderEventPublisher.publish(event);
     }
+
 
 
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class OrderEventPublisher {
 
     private static final String ORDER_EVENTS_TOPIC = "nova.order.events";
+    private static final String PAYMENT_EVENTS_TOPIC = "nova.payment.events";
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -79,6 +80,15 @@ public class OrderEventPublisher {
     public void publish(OrderRefundedEvent event){
         kafkaTemplate.send(
                 ORDER_EVENTS_TOPIC,
+                event.orderId(),
+                event
+        );
+    }
+
+    // 메서드9. 결제 요청 이벤트 발행
+    public void publish(PaymentRequestedEvent event){
+        kafkaTemplate.send(
+                PAYMENT_EVENTS_TOPIC,
                 event.orderId(),
                 event
         );
