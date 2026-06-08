@@ -43,49 +43,78 @@
     }
 
     async function createOrder() {
-        const res = await fetch("/api/orders", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                userId: "USER-001",
-                channel: "APP",
-                couponId: "CPN-WELCOME-001",
-                items: [
-                    {
-                        productId: "PRODUCT-001",
-                        productName: "Classic T-Shirt",
-                        category: "FASHION",
-                        quantity: 2,
-                        unitPrice: 29500
-                    },
-                    {
-                        productId: "PRODUCT-002",
-                        productName: "Daily Granola",
-                        category: "FOOD",
-                        quantity: 1,
-                        unitPrice: 12900
-                    }
-                ]
-            })
-        });
+        try {
+            print("주문 생성 요청 중...");
 
-        const data = await res.json();
-        orderIdInput.value = data.orderId;
-        print(data);
+            const res = await fetch("/api/orders", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    userId: "USER-001",
+                    channel: "APP",
+                    couponId: "CPN-WELCOME-001",
+                    items: [
+                        {
+                            productId: "PRODUCT-001",
+                            productName: "Classic T-Shirt",
+                            category: "FASHION",
+                            quantity: 2,
+                            unitPrice: 29500
+                        },
+                        {
+                            productId: "PRODUCT-002",
+                            productName: "Daily Granola",
+                            category: "FOOD",
+                            quantity: 1,
+                            unitPrice: 12900
+                        }
+                    ]
+                })
+            });
+
+            const text = await res.text();
+
+            if (!res.ok) {
+                print(`주문 생성 실패 / HTTP ${res.status}\n\n${text}`);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            orderIdInput.value = data.orderId;
+            print(data);
+
+        } catch (e) {
+            print("주문 생성 중 JS 에러 발생:\n" + e.message);
+        }
     }
 
     async function callAction(path, label) {
-        const orderId = orderIdInput.value;
-        if (!orderId) {
-            print("먼저 주문을 생성하세요.");
-            return;
+        try {
+            const orderId = orderIdInput.value;
+
+            if (!orderId) {
+                print("먼저 주문을 생성하세요.");
+                return;
+            }
+
+            print(`${label} 요청 중...`);
+
+            const res = await fetch(`/api/orders/${orderId}/${path}`, {
+                method: "POST"
+            });
+
+            const text = await res.text();
+
+            if (!res.ok) {
+                print(`${label} 실패 / HTTP ${res.status}\n\n${text}`);
+                return;
+            }
+
+            print(`${label} 성공 / HTTP ${res.status}`);
+
+        } catch (e) {
+            print(`${label} 중 JS 에러 발생:\n` + e.message);
         }
-
-        const res = await fetch(`/api/orders/${orderId}/${path}`, {
-            method: "POST"
-        });
-
-        print(`${label} 요청 완료 / HTTP ${res.status}`);
     }
 
     function payOrder() {
