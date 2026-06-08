@@ -199,5 +199,23 @@ public class OrderService {
         orderEventPublisher.publish(event);
     }
 
+    // 메서드8. 환불 완료 처리
+    @Transactional
+    public void refundOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+
+        order.refund();
+        OrderRefundedEvent event = new OrderRefundedEvent(
+                UUID.randomUUID().toString(),
+                "REFUNDED",
+                order.getOrderId(),
+                order.getUserId(),
+                order.getTotalAmount(),
+                LocalDateTime.now()
+        );
+        orderEventPublisher.publish(event);
+    }
+
 
 }

@@ -140,4 +140,13 @@ public class Order {
         this.status = OrderStatus.RETURNED;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 메서드10. 환불 완료
+    public void refund(){
+        if  (this.status != OrderStatus.RETURNED) {
+            throw new IllegalStateException("Only RETURNED orders can be refunded.");
+        }
+        this.status = OrderStatus.REFUNDED;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

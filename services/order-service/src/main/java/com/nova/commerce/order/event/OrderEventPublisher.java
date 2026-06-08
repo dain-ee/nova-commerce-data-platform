@@ -74,5 +74,14 @@ public class OrderEventPublisher {
                 event
         );
     }
+
+    // 메서드8. 환불 완료 이벤트 발행
+    public void publish(OrderRefundedEvent event){
+        kafkaTemplate.send(
+                ORDER_EVENTS_TOPIC,
+                event.orderId(),
+                event
+        );
+    }
 }
 
