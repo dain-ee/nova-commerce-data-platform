@@ -1,4 +1,4 @@
-package com.nova.commerce.payment.event;
+package com.nova.commerce.shipping.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -6,16 +6,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentEventPublisher {
+public class ShipmentEventPublisher {
 
-    private static final String PAYMENT_EVENTS_TOPIC = "nova.payment.events";
+    private static final String SHIPMENT_EVENT_TOPIC = "nova.shipment.events";
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    // 메서드1. 결제완료 이벤트 발행
-    public void publish(PaymentCompletedEvent event) {
+    // 메서드1. 배송시작 이벤트 발행
+    public void publish(OrderShippedEvent event){
         kafkaTemplate.send(
-                PAYMENT_EVENTS_TOPIC,
+                SHIPMENT_EVENT_TOPIC,
                 event.orderId(),
                 event
         );
