@@ -2,6 +2,7 @@ package com.nova.commerce.order.application;
 
 import com.nova.commerce.order.api.dto.CreateOrderRequest;
 import com.nova.commerce.order.api.dto.CreateOrderResponse;
+import com.nova.commerce.order.api.dto.OrderResponse;
 import com.nova.commerce.order.domain.Order;
 import com.nova.commerce.order.domain.OrderRepository;
 import com.nova.commerce.order.event.*;
@@ -235,6 +236,21 @@ public class OrderService {
                 LocalDateTime.now()
         );
         orderEventPublisher.publish(event);
+    }
+
+    // 메서드9. 주문 조회
+    @Transactional(readOnly = true)
+    public OrderResponse getOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+        return new OrderResponse(
+                order.getOrderId(),
+                order.getUserId(),
+                order.getStatus(),
+                order.getGrossAmount(),
+                order.getDiscountAmount(),
+                order.getTotalAmount()
+        );
     }
 
 

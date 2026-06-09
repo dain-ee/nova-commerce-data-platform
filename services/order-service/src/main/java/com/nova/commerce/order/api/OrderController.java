@@ -2,6 +2,7 @@ package com.nova.commerce.order.api;
 
 import com.nova.commerce.order.api.dto.CreateOrderRequest;
 import com.nova.commerce.order.api.dto.CreateOrderResponse;
+import com.nova.commerce.order.api.dto.OrderResponse;
 import com.nova.commerce.order.application.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,12 @@ public class OrderController {
     public ResponseEntity<Void> refundOrder(@PathVariable String orderId) {
         orderService.refundOrder(orderId);
         return ResponseEntity.noContent().build();
+    }
+
+    // API 9) 주문 조회
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable String orderId) {
+        return  ResponseEntity.ok(orderService.getOrder(orderId));
     }
 
 
