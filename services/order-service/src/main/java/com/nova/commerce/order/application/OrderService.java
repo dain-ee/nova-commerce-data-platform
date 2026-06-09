@@ -85,6 +85,25 @@ public class OrderService {
         );
     }
 
+    // 메서드3-1. 결제 완료 처리
+    @Transactional
+    public void completePayment(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
+        order.pay();
+
+        OrderPaidEvent event = new OrderPaidEvent(
+                UUID.randomUUID().toString(),
+                "ORDER_PAID",
+                order.getOrderId(),
+                order.getUserId(),
+                order.getTotalAmount(),
+                LocalDateTime.now()
+
+        );
+        orderEventPublisher.publish(event);
+    }
+
     // 메서드3. 주문 결제 처리
     @Transactional
     public void payOrder(String orderId) {
