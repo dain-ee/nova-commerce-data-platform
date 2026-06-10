@@ -1,5 +1,6 @@
 package com.nova.commerce.shipping.application;
 
+import com.nova.commerce.shipping.event.OrderDeliveredEvent;
 import com.nova.commerce.shipping.event.OrderShippedEvent;
 import com.nova.commerce.shipping.event.ShipmentEventPublisher;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,10 @@ public class ShipmentService {
 
     private final ShipmentEventPublisher shipmentEventPublisher;
 
+    // 메서드1. 배송 시작 처리
     @Transactional
     public void shipOrder(String orderId) {
 
-        // 메서드1. 배송 시작 처리
         OrderShippedEvent orderShippedEvent = new OrderShippedEvent(
                 UUID.randomUUID().toString(),
                 "ORDER_SHIPPED",
@@ -29,6 +30,21 @@ public class ShipmentService {
         );
 
         shipmentEventPublisher.publish(orderShippedEvent);
+    }
+
+    // 메서드2. 배송 완료 처리
+    @Transactional
+    public void deliverOrder(String orderId) {
+        OrderDeliveredEvent orderDeliveredEvent = new OrderDeliveredEvent(
+                UUID.randomUUID().toString(),
+                "ORDER_DELIVERED",
+                orderId,
+                null,
+                "DELIVERED",
+                LocalDateTime.now()
+        );
+
+        shipmentEventPublisher.publish(orderDeliveredEvent);
     }
 
 }

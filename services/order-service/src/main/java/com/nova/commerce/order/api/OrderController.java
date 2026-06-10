@@ -32,13 +32,6 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    // API 4) 주문 배송 완료 요청 처리
-    @PostMapping("/{orderId}/deliver")
-    public ResponseEntity<Void> deliverOrder(@PathVariable String orderId) {
-        orderService.deliverOrder(orderId);
-        return ResponseEntity.noContent().build();
-    }
-
     // API 5) 주문 취소 요청 처리
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable String orderId) {

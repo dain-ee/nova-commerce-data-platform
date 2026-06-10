@@ -20,4 +20,13 @@ public class ShipmentEventPublisher {
                 event
         );
     }
+
+    // 메서드2. 배송완료 이벤트 발행
+    public void publish(OrderDeliveredEvent event){
+        kafkaTemplate.send(
+                SHIPMENT_EVENT_TOPIC,
+                event.orderId(),
+                event
+        );
+    }
 }

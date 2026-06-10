@@ -189,8 +189,37 @@
         }
     }
 
-    function deliverOrder() {
-        callAction("deliver", "배송 완료");
+    async function deliverOrder() {
+
+        try {
+            const orderId = orderIdInput.value;
+
+            if (!orderId) {
+                print("먼저 주문을 생성하세요.");
+                return;
+            }
+
+            print("배송 완료 요청 중...");
+
+            const res = await fetch(
+                `http://localhost:8082/api/shipping/${orderId}/deliver`,
+                {
+                    method: "POST"
+                }
+            );
+
+            const text = await res.text();
+
+            if (!res.ok) {
+                print(`배송 완료 실패 / HTTP ${res.status}\n\n${text}`);
+                return;
+            }
+
+            print("배송 완료 성공\n\n상태 확인은 [주문 조회] 버튼을 누르세요.");
+
+        } catch (e) {
+            print("배송 완료 중 JS 에러 발생:\n" + e.message);
+        }
     }
 
     function requestReturn() {

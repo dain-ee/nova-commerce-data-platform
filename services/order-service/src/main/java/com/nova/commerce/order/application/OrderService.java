@@ -126,7 +126,7 @@ public class OrderService {
         orderEventPublisher.publish(event);
     }
 
-    // 메서드4-1. 배송 시작 완료 처리
+    // 메서드4-1. 배송 시작 표시 처리
     @Transactional
     public void markAsShipped(String orderId) {
         Order order = orderRepository.findById(orderId)
@@ -134,25 +134,14 @@ public class OrderService {
         order.ship();
     }
 
-
-    // 메서드4. 주문 배송 완료 처리
+    // 메서드4-2. 배송 완료 표시 처리
     @Transactional
-    public void deliverOrder(String orderId) {
+    public void markAsDelivered(String orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
-
         order.deliver();
-
-        OrderDeliveredEvent event = new OrderDeliveredEvent(
-                UUID.randomUUID().toString(),
-                "ORDER_DELIVERED",
-                order.getOrderId(),
-                order.getUserId(),
-                "DELIVERED",
-                LocalDateTime.now()
-        );
-        orderEventPublisher.publish(event);
     }
+
 
     // 메서드5. 주문 취소 처리
     @Transactional

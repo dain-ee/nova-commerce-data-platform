@@ -19,4 +19,11 @@ public class ShipmentController {
         shipmentService.shipOrder(orderId);
         return ResponseEntity.noContent().build();
     }
+
+    // API2) 배송 완료 요청 처리
+    @PostMapping("/{orderId}/deliver")
+    public ResponseEntity<Void> deliverOrder(@PathVariable String orderId) {
+        shipmentService.deliverOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
 }
