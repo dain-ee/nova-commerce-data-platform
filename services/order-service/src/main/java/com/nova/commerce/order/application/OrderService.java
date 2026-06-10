@@ -9,6 +9,7 @@ import com.nova.commerce.order.event.*;
 import com.nova.commerce.order.api.dto.CreateOrderItemRequest;
 import com.nova.commerce.order.domain.OrderItem;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,24 +126,14 @@ public class OrderService {
         orderEventPublisher.publish(event);
     }
 
-    // 메서드4. 주문 배송 시작 처리
+    // 메서드4-1. 배송 시작 완료 처리
     @Transactional
-    public void shipOrder(String orderId) {
+    public void markAsShipped(String orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found. orderId=" + orderId));
-
         order.ship();
-
-        OrderShippedEvent event = new OrderShippedEvent(
-                UUID.randomUUID().toString(),
-                "ORDER_SHIPPED",
-                order.getOrderId(),
-                order.getUserId(),
-                "SHIPPED",
-                LocalDateTime.now()
-        );
-        orderEventPublisher.publish(event);
     }
+
 
     // 메서드4. 주문 배송 완료 처리
     @Transactional

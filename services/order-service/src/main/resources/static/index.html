@@ -16,10 +16,10 @@
 <div class="box">
     <h2>Nova Commerce 주문 이벤트 테스트</h2>
 
-    <label>Order ID</label><br/>
+    <label for="orderId">Order ID</label><br/>
     <input id="orderId" placeholder="주문 생성 후 자동 입력됨" />
 
-    <p class="hint">주문 생성 → 조회 → 결제 → 조회 순서로 상태 변화를 확인하세요.</p>
+    <p class="hint">[주문 생성 → 조회 → 결제 → 조회 → 배송 시작 → 조회] 순서로 상태 변화를 확인하세요.</p>
 
     <div>
         <button onclick="createOrder()">주문 생성</button>
@@ -86,6 +86,7 @@
             const data = JSON.parse(text);
             orderIdInput.value = data.orderId;
             print(data);
+
 
         } catch (e) {
             print("주문 생성 중 JS 에러 발생:\n" + e.message);
@@ -155,8 +156,37 @@
         callAction("pay", "결제");
     }
 
-    function shipOrder() {
-        callAction("ship", "배송 시작");
+    async function shipOrder() {
+
+        try {
+            const orderId = orderIdInput.value;
+
+            if (!orderId) {
+                print("먼저 주문을 생성하세요.");
+                return;
+            }
+
+            print("배송 시작 요청 중...");
+
+            const res = await fetch(
+                `http://localhost:8082/api/shipping/${orderId}/ship`,
+                {
+                    method: "POST"
+                }
+            );
+
+            const text = await res.text();
+
+            if (!res.ok) {
+                print(`배송 시작 실패 / HTTP ${res.status}\n\n${text}`);
+                return;
+            }
+
+            print("배송 시작 성공\n\n상태 확인은 [주문 조회] 버튼을 누르세요.");
+
+        } catch (e) {
+            print("배송 시작 중 JS 에러 발생:\n" + e.message);
+        }
     }
 
     function deliverOrder() {
